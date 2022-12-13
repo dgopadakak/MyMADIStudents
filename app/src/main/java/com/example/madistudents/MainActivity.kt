@@ -3,6 +3,7 @@ package com.example.madistudents
 import android.app.Activity
 import android.os.Bundle
 import android.view.Menu
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
@@ -22,6 +23,10 @@ import java.net.Socket
 
 class MainActivity : AppCompatActivity()
 {
+    private val serverIP = "192.168.1.69"
+    private val serverPort = 9876
+    private lateinit var connection: Connection
+
     private val go: GroupOperator = GroupOperator(this)
     //private val goFromServer: GroupOperator
 
@@ -53,6 +58,8 @@ class MainActivity : AppCompatActivity()
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        connection = Connection(serverIP, serverPort, "{R}", this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean
@@ -130,7 +137,12 @@ class MainActivity : AppCompatActivity()
 
         private fun processingInputStream(text: String)
         {
-
+            val toast = Toast.makeText(
+                activity,
+                text,
+                Toast.LENGTH_SHORT
+            )
+            toast.show()
         }
 
         init {
