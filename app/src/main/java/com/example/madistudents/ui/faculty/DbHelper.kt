@@ -66,7 +66,7 @@ class DbHelper(
             null, null, null, null)
         cursor.moveToFirst()
         val index = cursor.getColumnIndex(col11)
-        var groupId: Int = -1
+        var groupId: Int = -10
         if (index >= 0)
         {
             groupId = cursor.getInt(index)
