@@ -1,9 +1,16 @@
 package com.example.madistudents.ui.faculty
 
-import android.content.Context
-
-class GroupOperator(context: Context)
+class GroupOperator()
 {
     private var groups: ArrayList<Group> = ArrayList()
-    var dbh: DbHelper = DbHelper(context, "MyFirstDB", null, 1)
+
+    fun getGroups(): ArrayList<Group>
+    {
+        return groups
+    }
+
+    fun setGroups(newGroups: ArrayList<Group>)
+    {
+        groups = newGroups
+    }
 }

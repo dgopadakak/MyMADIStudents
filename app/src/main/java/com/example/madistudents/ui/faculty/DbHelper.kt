@@ -1,11 +1,11 @@
 package com.example.madistudents.ui.faculty
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-
 
 class DbHelper(
     context: Context?,
@@ -91,5 +91,57 @@ class DbHelper(
             }
         }
         return forReturn
+    }
+
+    @SuppressLint("Range")
+    fun getAllData(): ArrayList<Group>
+    {
+        val arrayListForReturn: ArrayList<Group> = ArrayList()
+        val db = this.writableDatabase
+        val cursor1: Cursor = db.query(table1Name, null, null,
+            null, null, null, null)
+        cursor1.moveToFirst()
+        while (!cursor1.isAfterLast)
+        {
+            val tempArrayListForExams: ArrayList<Exam> = ArrayList()
+            val index = cursor1.getColumnIndex(col11)
+            var groupId: Int = -10
+            if (index >= 0)
+            {
+                groupId = cursor1.getInt(index)
+            }
+            val cursor2: Cursor = db.query(table2Name,
+                arrayOf(col22, col23, col24, col25, col26, col27, col28, col29, col210),
+                "$col22 = $groupId",
+                null, null, null, null)
+            cursor2.moveToFirst()
+            while (!cursor2.isAfterLast)
+            {
+                tempArrayListForExams.add(Exam(
+                    cursor2.getString(cursor2.getColumnIndex(col23)),
+                    cursor2.getString(cursor2.getColumnIndex(col24)),
+                    cursor2.getInt(cursor2.getColumnIndex(col25)),
+                    cursor2.getString(cursor2.getColumnIndex(col26)),
+                    cursor2.getString(cursor2.getColumnIndex(col27)),
+                    cursor2.getInt(cursor2.getColumnIndex(col28)),
+                    cursor2.getInt(cursor2.getColumnIndex(col29)),
+                    cursor2.getString(cursor2.getColumnIndex(col210))
+                ))
+                cursor2.moveToNext()
+            }
+            arrayListForReturn.add(Group(cursor1.getString(cursor1.getColumnIndex(col12)),
+                tempArrayListForExams))
+            cursor2.close()
+            cursor1.moveToNext()
+        }
+        cursor1.close()
+        return arrayListForReturn
+    }
+
+    fun removeAllData()
+    {
+        val db = this.writableDatabase
+        db.delete(table1Name, null, null)
+        db.delete(table2Name, null, null)
     }
 }

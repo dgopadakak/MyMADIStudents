@@ -12,9 +12,13 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.madistudents.databinding.ActivityMainBinding
+import com.example.madistudents.ui.faculty.DbHelper
+import com.example.madistudents.ui.faculty.Group
 import com.example.madistudents.ui.faculty.GroupOperator
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -23,11 +27,15 @@ import java.net.Socket
 
 class MainActivity : AppCompatActivity()
 {
+    private val gsonBuilder = GsonBuilder()
+    private val gson: Gson = gsonBuilder.create()
     private val serverIP = "192.168.1.69"
     private val serverPort = 9876
     private lateinit var connection: Connection
+    private lateinit var dbh: DbHelper
+    private var dbVersion = 2
 
-    private val go: GroupOperator = GroupOperator(this)
+    private val go: GroupOperator = GroupOperator()
     //private val goFromServer: GroupOperator
 
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -59,6 +67,8 @@ class MainActivity : AppCompatActivity()
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
+        dbh = DbHelper(this, "MyFirstDB", null, dbVersion)
+        //val tempArrayList: ArrayList<Group> = dbh.getAllData()
         connection = Connection(serverIP, serverPort, "{R}", this)
     }
 
@@ -75,7 +85,7 @@ class MainActivity : AppCompatActivity()
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-    internal class Connection(
+    internal inner class Connection(
         private val SERVER_IP: String,
         private val SERVER_PORT: Int,
         private val refreshCommand: String,
@@ -137,12 +147,12 @@ class MainActivity : AppCompatActivity()
 
         private fun processingInputStream(text: String)
         {
-            val toast = Toast.makeText(
-                activity,
-                text,
-                Toast.LENGTH_SHORT
-            )
-            toast.show()
+            dbh.removeAllData()
+            val tempGo: GroupOperator = gson.fromJson(text, GroupOperator::class.java)
+            for (i in tempGo.getGroups())
+            {
+                dbh.insertGroup(i)
+            }
         }
 
         init {
