@@ -4,6 +4,8 @@ import android.app.Activity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.ui.AppBarConfiguration
@@ -34,8 +36,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private lateinit var nv: NavigationView
     private var startTime: Long = 0
-
-    private lateinit var menu: Menu
+    private lateinit var progressBar: ProgressBar
 
     private val go: GroupOperator = GroupOperator()
 
@@ -58,12 +59,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         nv = binding.navView
         nv.setNavigationItemSelectedListener(this)
+        progressBar = findViewById(R.id.progressBar)
 
         dbh = DbHelper(this, "MyFirstDB", null, dbVersion)
-        val tempArrayListGroups: ArrayList<Group> = dbh.getAllData()
         startTime = System.currentTimeMillis()
         connection = Connection(serverIP, serverPort, "{R}", this)
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean
@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         private var outputServer: PrintWriter? = null
         private var inputServer: BufferedReader? = null
         var thread1: Thread? = null
-        var threadT: Thread? = null
+        private var threadT: Thread? = null
 
         internal inner class Thread1Server : Runnable {
             override fun run()
@@ -134,15 +134,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             override fun run() {
                 while (true)
                 {
-                    if (System.currentTimeMillis() - startTime > 5000L && connectionStage != -1)
+                    if (System.currentTimeMillis() - startTime > 5000L && connectionStage == 0)
                     {
                         activity.runOnUiThread { val toast = Toast.makeText(
                             applicationContext,
-                            "Подключиться не удалось!",
+                            "Подключиться не удалось!\n" +
+                                    "Будут использоваться данные из локальной базы данных.",
                             Toast.LENGTH_SHORT
                         )
                             toast.show() }
                         connectionStage = -1
+                        progressBar.visibility = View.INVISIBLE
+                        val tempArrayListGroups: ArrayList<Group> = dbh.getAllData()
+                        go.setGroups(tempArrayListGroups)
+                        for (i in 0 until tempArrayListGroups.size)
+                        {
+                            activity.runOnUiThread { nv.menu.add(0, i, 0,
+                                tempArrayListGroups[i].name as CharSequence) }
+                        }
                     }
                 }
             }
@@ -161,6 +170,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             {
                 dbh.insertGroup(i)
             }
+            connectionStage = 1
+            val toast = Toast.makeText(
+                applicationContext,
+                "Успешно подключено!\n" +
+                        "Будут использоваться данные, полученные от сервера.",
+                Toast.LENGTH_SHORT
+            )
+            toast.show()
+            progressBar.visibility = View.INVISIBLE
+            val tempArrayListGroups: ArrayList<Group> = dbh.getAllData()
+            go.setGroups(tempArrayListGroups)
+            for (i in 0 until tempArrayListGroups.size)
+            {
+                nv.menu.add(0, i, 0,
+                    tempArrayListGroups[i].name as CharSequence)
+            }
         }
 
         init {
@@ -178,7 +203,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             Toast.LENGTH_SHORT
         )
         toast.show()
-        nv.menu.removeItem(R.id.nav_home)
         return true
     }
 }
