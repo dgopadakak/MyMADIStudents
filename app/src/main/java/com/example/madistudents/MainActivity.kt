@@ -1,6 +1,8 @@
 package com.example.madistudents
 
 import android.app.Activity
+import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -9,7 +11,11 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.ui.AppBarConfiguration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.madistudents.databinding.ActivityMainBinding
+import com.example.madistudents.forRecyclerView.CustomRecyclerAdapterForExams
+import com.example.madistudents.forRecyclerView.RecyclerItemClickListener
 import com.example.madistudents.ui.faculty.DbHelper
 import com.example.madistudents.ui.faculty.Group
 import com.example.madistudents.ui.faculty.GroupOperator
@@ -37,6 +43,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var nv: NavigationView
     private var startTime: Long = 0
     private lateinit var progressBar: ProgressBar
+    private lateinit var recyclerViewExams: RecyclerView
 
     private val go: GroupOperator = GroupOperator()
 
@@ -60,6 +67,26 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         nv = binding.navView
         nv.setNavigationItemSelectedListener(this)
         progressBar = findViewById(R.id.progressBar)
+        recyclerViewExams = findViewById(R.id.recyclerViewExams)
+        recyclerViewExams.visibility = View.INVISIBLE
+        recyclerViewExams.layoutManager = LinearLayoutManager(this)
+
+        recyclerViewExams.addOnItemTouchListener(
+            RecyclerItemClickListener(
+                recyclerViewExams,
+                object : RecyclerItemClickListener.OnItemClickListener
+                {
+                    override fun onItemClick(view: View, position: Int)
+                    {
+
+                    }
+                    override fun onItemLongClick(view: View, position: Int)
+                    {
+
+                    }
+                }
+            )
+        )
 
         dbh = DbHelper(this, "MyFirstDB", null, dbVersion)
         startTime = System.currentTimeMillis()
@@ -140,7 +167,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             applicationContext,
                             "Подключиться не удалось!\n" +
                                     "Будут использоваться данные из локальной базы данных.",
-                            Toast.LENGTH_SHORT
+                            Toast.LENGTH_LONG
                         )
                             toast.show() }
                         connectionStage = -1
@@ -170,14 +197,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             {
                 dbh.insertGroup(i)
             }
+            if (connectionStage == 0)
+            {
+                val toast = Toast.makeText(
+                    applicationContext,
+                    "Успешно подключено!\n" +
+                            "Будут использоваться данные, полученные от сервера.",
+                    Toast.LENGTH_LONG
+                )
+                toast.show()
+            }
             connectionStage = 1
-            val toast = Toast.makeText(
-                applicationContext,
-                "Успешно подключено!\n" +
-                        "Будут использоваться данные, полученные от сервера.",
-                Toast.LENGTH_SHORT
-            )
-            toast.show()
             progressBar.visibility = View.INVISIBLE
             val tempArrayListGroups: ArrayList<Group> = dbh.getAllData()
             go.setGroups(tempArrayListGroups)
@@ -199,10 +229,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         val toast = Toast.makeText(
             applicationContext,
-            "Элемент: $item",
+            "Выбрана группа: $item.",
             Toast.LENGTH_SHORT
         )
         toast.show()
+        recyclerViewExams.adapter = CustomRecyclerAdapterForExams(go.getExamsNames(item.itemId),
+            go.getTeachersNames(item.itemId))
+        recyclerViewExams.visibility = View.VISIBLE
         return true
     }
 }
