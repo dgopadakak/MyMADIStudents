@@ -3,14 +3,10 @@ package com.example.madistudents
 import android.app.Activity
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
 import com.example.madistudents.databinding.ActivityMainBinding
 import com.example.madistudents.ui.faculty.DbHelper
 import com.example.madistudents.ui.faculty.Group
@@ -25,18 +21,23 @@ import java.io.InputStreamReader
 import java.io.PrintWriter
 import java.net.Socket
 
-class MainActivity : AppCompatActivity()
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener
 {
     private val gsonBuilder = GsonBuilder()
     private val gson: Gson = gsonBuilder.create()
     private val serverIP = "192.168.1.69"
     private val serverPort = 9876
     private lateinit var connection: Connection
+    private var connectionStage: Int = 0
     private lateinit var dbh: DbHelper
     private var dbVersion = 2
 
+    private lateinit var nv: NavigationView
+    private var startTime: Long = 0
+
+    private lateinit var menu: Menu
+
     private val go: GroupOperator = GroupOperator()
-    //private val goFromServer: GroupOperator
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
@@ -54,35 +55,22 @@ class MainActivity : AppCompatActivity()
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
         }
-        val drawerLayout: DrawerLayout = binding.drawerLayout
-        val navView: NavigationView = binding.navView
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow
-            ), drawerLayout
-        )
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
+
+        nv = binding.navView
+        nv.setNavigationItemSelectedListener(this)
 
         dbh = DbHelper(this, "MyFirstDB", null, dbVersion)
-        //val tempArrayList: ArrayList<Group> = dbh.getAllData()
+        val tempArrayListGroups: ArrayList<Group> = dbh.getAllData()
+        startTime = System.currentTimeMillis()
         connection = Connection(serverIP, serverPort, "{R}", this)
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean
     {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.main, menu)
+        val inflater = menuInflater
+        inflater.inflate(R.menu.main, menu)
         return true
-    }
-
-    override fun onSupportNavigateUp(): Boolean
-    {
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
     internal inner class Connection(
@@ -94,6 +82,7 @@ class MainActivity : AppCompatActivity()
         private var outputServer: PrintWriter? = null
         private var inputServer: BufferedReader? = null
         var thread1: Thread? = null
+        var threadT: Thread? = null
 
         internal inner class Thread1Server : Runnable {
             override fun run()
@@ -140,6 +129,25 @@ class MainActivity : AppCompatActivity()
             }
         }
 
+        internal inner class ThreadT(): Runnable
+        {
+            override fun run() {
+                while (true)
+                {
+                    if (System.currentTimeMillis() - startTime > 5000L && connectionStage != -1)
+                    {
+                        activity.runOnUiThread { val toast = Toast.makeText(
+                            applicationContext,
+                            "Подключиться не удалось!",
+                            Toast.LENGTH_SHORT
+                        )
+                            toast.show() }
+                        connectionStage = -1
+                    }
+                }
+            }
+        }
+
         fun sendDataToServer(text: String)
         {
             Thread(Thread3Server(text + "\n")).start()
@@ -158,6 +166,19 @@ class MainActivity : AppCompatActivity()
         init {
             thread1 = Thread(Thread1Server())
             thread1!!.start()
+            threadT = Thread(ThreadT())
+            threadT!!.start()
         }
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        val toast = Toast.makeText(
+            applicationContext,
+            "Элемент: $item",
+            Toast.LENGTH_SHORT
+        )
+        toast.show()
+        nv.menu.removeItem(R.id.nav_home)
+        return true
     }
 }
