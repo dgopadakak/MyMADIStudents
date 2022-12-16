@@ -33,4 +33,9 @@ class GroupOperator()
         }
         return arrayListForReturn
     }
+
+    fun getExam(indexGroup: Int, indexExam: Int): Exam
+    {
+        return groups[indexGroup].listOfExams[indexExam]
+    }
 }

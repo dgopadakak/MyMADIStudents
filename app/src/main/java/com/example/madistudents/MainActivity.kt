@@ -27,7 +27,8 @@ import java.io.InputStreamReader
 import java.io.PrintWriter
 import java.net.Socket
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
+    ExamDetailsDialogFragment.OnInputListenerSortId
 {
     private val gsonBuilder = GsonBuilder()
     private val gson: Gson = gsonBuilder.create()
@@ -45,6 +46,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var recyclerViewExams: RecyclerView
 
     private val go: GroupOperator = GroupOperator()
+    private var currentGroupID: Int = -1
+    private var currentExamID: Int = -1
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
@@ -79,7 +82,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 {
                     override fun onItemClick(view: View, position: Int)
                     {
-
+                        currentExamID = position
+                        val examDetails = ExamDetailsDialogFragment()
+                        val tempExam = go.getExam(currentGroupID, currentExamID)
+                        val bundle = Bundle()
+                        bundle.putString("examName", tempExam.nameOfExam)
+                        bundle.putString("teacherName", tempExam.nameOfTeacher)
+                        bundle.putString("auditory", tempExam.auditory.toString())
+                        bundle.putString("date", tempExam.date)
+                        bundle.putString("time", tempExam.time)
+                        bundle.putString("people", tempExam.peopleInAuditory.toString())
+                        bundle.putString("abstract", tempExam.isAbstractAvailable.toString())
+                        bundle.putString("comment", tempExam.comment)
+                        examDetails.arguments = bundle
+                        examDetails.show(fragmentManager, "MyCustomDialog")
                     }
                     override fun onItemLongClick(view: View, position: Int)
                     {
@@ -234,9 +250,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             Toast.LENGTH_SHORT
         )
         toast.show()
+        currentGroupID = item.itemId
         recyclerViewExams.adapter = CustomRecyclerAdapterForExams(go.getExamsNames(item.itemId),
             go.getTeachersNames(item.itemId))
         recyclerViewExams.visibility = View.VISIBLE
         return true
+    }
+
+    override fun sendInputSortId(sortId: Int)
+    {
+        val toast = Toast.makeText(
+            applicationContext,
+            "ID параметра для сортировки: $sortId.",
+            Toast.LENGTH_LONG
+        )
+        toast.show()
     }
 }
