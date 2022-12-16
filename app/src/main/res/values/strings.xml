@@ -6,5 +6,13 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+    <string name="exam_name">Предмет:</string>
     <string name="teacher">Преподаватель:</string>
+    <string name="auditory">Номер аудитории:</string>
+    <string name="date">Дата экзамена:</string>
+    <string name="time">Время начала экзамена:</string>
+    <string name="people_in_auditory">Заходить по (человек):</string>
+    <string name="is_abstract_available">Пользоваться лекциями:</string>
+    <string name="comment">Комментарий преподавателя:</string>
+    <string name="button_ok">Ок</string>
 </resources>

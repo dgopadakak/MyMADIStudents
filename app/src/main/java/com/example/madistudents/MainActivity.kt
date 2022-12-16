@@ -1,8 +1,6 @@
 package com.example.madistudents
 
 import android.app.Activity
-import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -42,6 +40,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private lateinit var nv: NavigationView
     private var startTime: Long = 0
+    //private lateinit var toolbar: androidx.appcompat.widget.Toolbar
     private lateinit var progressBar: ProgressBar
     private lateinit var recyclerViewExams: RecyclerView
 
@@ -66,6 +65,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         nv = binding.navView
         nv.setNavigationItemSelectedListener(this)
+        ///toolbar = findViewById(R.id.toolbar)
+        //toolbar.apply { setNavigationIcon(android.R.drawable.ic_menu_sort_by_size) }
         progressBar = findViewById(R.id.progressBar)
         recyclerViewExams = findViewById(R.id.recyclerViewExams)
         recyclerViewExams.visibility = View.INVISIBLE
@@ -156,7 +157,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
 
-        internal inner class ThreadT(): Runnable
+        internal inner class ThreadT : Runnable
         {
             override fun run() {
                 while (true)
