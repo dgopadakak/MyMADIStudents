@@ -38,4 +38,34 @@ class GroupOperator()
     {
         return groups[indexGroup].listOfExams[indexExam]
     }
+
+    fun sortExams(indexGroup: Int, sortIndex: Int)
+    {
+        if (sortIndex == 0)
+        {
+            val tempArrayListOfExamsNames: ArrayList<String> = ArrayList()
+            val tempArrayListOfExams: ArrayList<Exam> = ArrayList()
+            for (i in groups[indexGroup].listOfExams)
+            {
+                tempArrayListOfExamsNames.add(i.nameOfExam)
+            }
+            tempArrayListOfExamsNames.sort()
+            for (i in tempArrayListOfExamsNames)
+            {
+                for (j in groups[indexGroup].listOfExams)
+                {
+                    if (i == j.nameOfExam)
+                    {
+                        tempArrayListOfExams.add(j)
+                    }
+                }
+            }
+            groups[indexGroup].listOfExams = tempArrayListOfExams
+        }
+        if (sortIndex == 1)
+        {
+            val tempArrayListOfExamsNames: ArrayList<String> = ArrayList()
+            val tempArrayListOfExams: ArrayList<Exam> = ArrayList()
+        }
+    }
 }

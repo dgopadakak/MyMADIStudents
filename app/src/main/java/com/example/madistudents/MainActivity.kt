@@ -6,9 +6,11 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.ui.AppBarConfiguration
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.madistudents.databinding.ActivityMainBinding
@@ -38,10 +40,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var connectionStage: Int = 0
     private lateinit var dbh: DbHelper
     private var dbVersion = 2
-
-    private lateinit var nv: NavigationView
     private var startTime: Long = 0
-    //private lateinit var toolbar: androidx.appcompat.widget.Toolbar
+
+    private lateinit var textViewGroupName: TextView
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var nv: NavigationView
+    private lateinit var toolbar: androidx.appcompat.widget.Toolbar
     private lateinit var progressBar: ProgressBar
     private lateinit var recyclerViewExams: RecyclerView
 
@@ -49,7 +53,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var currentGroupID: Int = -1
     private var currentExamID: Int = -1
 
-    private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -66,10 +69,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 .setAction("Action", null).show()
         }
 
+        textViewGroupName = findViewById(R.id.textViewGroupName)
+        drawerLayout = binding.drawerLayout
         nv = binding.navView
         nv.setNavigationItemSelectedListener(this)
-        ///toolbar = findViewById(R.id.toolbar)
-        //toolbar.apply { setNavigationIcon(android.R.drawable.ic_menu_sort_by_size) }
+        toolbar = findViewById(R.id.toolbar)
+        toolbar.apply { setNavigationIcon(R.drawable.ic_my_menu) }
+        toolbar.setNavigationOnClickListener { drawerLayout.openDrawer(GravityCompat.START) }
         progressBar = findViewById(R.id.progressBar)
         recyclerViewExams = findViewById(R.id.recyclerViewExams)
         recyclerViewExams.visibility = View.INVISIBLE
@@ -244,15 +250,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        val toast = Toast.makeText(
-            applicationContext,
-            "Выбрана группа: $item.",
-            Toast.LENGTH_SHORT
-        )
-        toast.show()
+//        val toast = Toast.makeText(   // не удалять, заменить
+//            applicationContext,
+//            "Выбрана группа: $item.",
+//            Toast.LENGTH_SHORT
+//        )
+//        toast.show()
+        //toolbar.title = "Группа ${item.title}"
+        val tempString = "Группа ${item.title}"
+        textViewGroupName.text = tempString
         currentGroupID = item.itemId
-        recyclerViewExams.adapter = CustomRecyclerAdapterForExams(go.getExamsNames(item.itemId),
-            go.getTeachersNames(item.itemId))
+        recyclerViewExams.adapter = CustomRecyclerAdapterForExams(go.getExamsNames(currentGroupID),
+            go.getTeachersNames(currentGroupID))
         recyclerViewExams.visibility = View.VISIBLE
         return true
     }
@@ -265,5 +274,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             Toast.LENGTH_LONG
         )
         toast.show()
+        if (sortId != -1)
+        {
+            go.sortExams(currentGroupID, sortId)
+        }
+        recyclerViewExams.adapter = CustomRecyclerAdapterForExams(
+            go.getExamsNames(currentGroupID),
+            go.getTeachersNames(currentGroupID))
     }
 }
