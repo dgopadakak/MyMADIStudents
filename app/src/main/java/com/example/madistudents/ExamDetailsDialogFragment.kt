@@ -107,7 +107,8 @@ class ExamDetailsDialogFragment: android.app.DialogFragment()
     {
         currentIdForSort = id
         val vibrator = context?.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-        vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE))
+        vibrator.vibrate(VibrationEffect.createOneShot(200
+            , VibrationEffect.DEFAULT_AMPLITUDE))
         return true
     }
 

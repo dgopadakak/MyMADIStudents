@@ -23,7 +23,6 @@ import com.example.madistudents.ui.faculty.Exam
 import com.example.madistudents.ui.faculty.Group
 import com.example.madistudents.ui.faculty.GroupOperator
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import java.io.BufferedReader
@@ -68,10 +67,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         setSupportActionBar(binding.appBarMain.toolbar)
 
-        binding.appBarMain.fab.setOnClickListener{ view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-        }
+//        binding.appBarMain.fab.setOnClickListener{ view ->
+//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                .setAction("Action", null).show()
+//        }
 
         textViewGroupName = findViewById(R.id.textViewGroupName)
         drawerLayout = binding.drawerLayout
@@ -110,7 +109,33 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     }
                     override fun onItemLongClick(view: View, position: Int)
                     {
-
+                        if (connectionStage == 1)
+                        {
+                            currentExamID = position
+                            val manager: FragmentManager = supportFragmentManager
+                            val myDialogFragmentDelExam = MyDialogFragmentDelExam()
+                            val bundle = Bundle()
+                            bundle.putString(
+                                "exam",
+                                go.getExam(currentGroupID, currentExamID).nameOfExam
+                            )
+                            myDialogFragmentDelExam.arguments = bundle
+                            myDialogFragmentDelExam.show(manager, "myDialog")
+                        }
+                        else
+                        {
+                            val toast = Toast.makeText(
+                                applicationContext,
+                                "Приложение оффлайн!",
+                                Toast.LENGTH_LONG
+                            )
+                            toast.show()
+                        }
+//                        val vibrator = this@MainActivity.getSystemService(
+//                            Context.VIBRATOR_SERVICE) as Vibrator
+//                        vibrator.vibrate(
+//                            VibrationEffect.createOneShot(200
+//                            , VibrationEffect.DEFAULT_AMPLITUDE))
                     }
                 }
             )
@@ -126,6 +151,28 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val inflater = menuInflater
         inflater.inflate(R.menu.main, menu)
         return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean
+    {
+        if (currentGroupID != -1)
+        {
+            menu.getItem(0).isVisible = true
+        }
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean
+    {
+        val id = item.itemId
+        if (id == R.id.action_add)
+        {
+            val intent = Intent()
+            intent.setClass(this, EditExamActivity::class.java)
+            intent.putExtra("action", 1)
+            startActivityForResult(intent, 1)
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     internal inner class Connection(
@@ -280,6 +327,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         //toolbar.title = "Группа ${item.title}"
         val tempString = "Группа ${item.title}"
         textViewGroupName.text = tempString
+        invalidateOptionsMenu()
         currentGroupID = item.itemId
         recyclerViewExams.adapter = CustomRecyclerAdapterForExams(go.getExamsNames(currentGroupID),
             go.getTeachersNames(currentGroupID))
@@ -351,17 +399,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             val people = data.getSerializableExtra("people") as Int
             val abstract = data.getSerializableExtra("abstract") as Int
             val comment = data.getSerializableExtra("comment") as String
+            val tempExam = Exam(examName, teacherName, auditory, date, time, people
+                , abstract, comment)
+            val tempExamJSON: String = gson.toJson(tempExam)
 
             if (action == 1)
             {
-
+                val tempStringToSend = "a$currentGroupID##$tempExamJSON"
+                connection.sendDataToServer(tempStringToSend)
+                waitingForUpdate = true
             }
             if (action == 2)
             {
-                val tempExam = Exam(examName, teacherName, auditory, date, time, people
-                    , abstract, comment)
-                val tempExamJSON: String = gson.toJson(tempExam)
-                val tempStringToSend = "e$currentGroupID,$currentExamID##$tempExamJSON"
+                val tempStringToSend = "e${go.getGroups()[currentGroupID].name}" +
+                        ",$currentExamID##$tempExamJSON"
                 connection.sendDataToServer(tempStringToSend)
                 waitingForUpdate = true
             }

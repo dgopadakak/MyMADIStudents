@@ -25,4 +25,6 @@
     <string name="people_in_auditory_hint">Количество</string>
     <string name="is_abstract_available_hint">Можно/Нельзя</string>
     <string name="comment_hint">Введите комментаий</string>
+    <string name="plus_button_description">Довавить экзамен</string>
+    <string name="plus">➕</string>
 </resources>
