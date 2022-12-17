@@ -1,11 +1,14 @@
 package com.example.madistudents
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import java.text.SimpleDateFormat
+import java.time.LocalTime
 import java.util.*
 
 class EditExamActivity : AppCompatActivity()
@@ -67,18 +70,31 @@ class EditExamActivity : AppCompatActivity()
             if (editAbstract.text.toString().trim().lowercase(Locale.ROOT) == "можно"
                 || editAbstract.text.toString().trim().lowercase(Locale.ROOT) == "нельзя")
             {
-                val intent = Intent(this@EditExamActivity, MainActivity::class.java)
-                intent.putExtra("action", action)
-                intent.putExtra("exam", editExamName.text.toString().trim())
-                intent.putExtra("teacher", editTeacherName.text.toString().trim())
-                intent.putExtra("auditory", editAuditory.text.toString().trim())
-                intent.putExtra("date", editDate.text.toString().trim())
-                intent.putExtra("time", editTime.text.toString().trim())
-                intent.putExtra("people", editPeople.text.toString().trim())
-                intent.putExtra("abstract", editAbstract.text.toString().trim())
-                intent.putExtra("comment", editComment.text.toString().trim())
-                setResult(RESULT_OK, intent)
-                finish()
+                if (isDateValid(editDate.text.toString().trim())
+                    && isTimeValid(editTime.text.toString().trim()))
+                {
+                    val intent = Intent(this@EditExamActivity, MainActivity::class.java)
+                    intent.putExtra("action", action)
+                    intent.putExtra("exam", editExamName.text.toString().trim())
+                    intent.putExtra("teacher", editTeacherName.text.toString().trim())
+                    intent.putExtra("auditory", editAuditory.text.toString().trim())
+                    intent.putExtra("date", editDate.text.toString().trim())
+                    intent.putExtra("time", editTime.text.toString().trim())
+                    intent.putExtra("people", editPeople.text.toString().trim())
+                    intent.putExtra("abstract", editAbstract.text.toString().trim())
+                    intent.putExtra("comment", editComment.text.toString().trim())
+                    setResult(RESULT_OK, intent)
+                    finish()
+                }
+                else
+                {
+                    val toast = Toast.makeText(
+                        applicationContext,
+                        "Проверьте дату и время!",
+                        Toast.LENGTH_SHORT
+                    )
+                    toast.show()
+                }
             }
             else
             {
@@ -99,6 +115,38 @@ class EditExamActivity : AppCompatActivity()
                 Toast.LENGTH_SHORT
             )
             toast.show()
+        }
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private fun isDateValid(date: String?): Boolean
+    {
+        val myFormat = SimpleDateFormat("dd.MM.yyyy")
+        myFormat.isLenient = false
+        return try
+        {
+            if (date != null)
+            {
+                myFormat.parse(date)
+            }
+            true
+        }
+        catch (e: Exception)
+        {
+            false
+        }
+    }
+
+    private fun isTimeValid(date: String?): Boolean
+    {
+        return try
+        {
+            LocalTime.parse(date)
+            true
+        }
+        catch (e: java.lang.Exception)
+        {
+            false
         }
     }
 }
