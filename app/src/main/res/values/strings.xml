@@ -17,4 +17,12 @@
     <string name="button_ok">Ок</string>
     <string name="button_del">Удалить</string>
     <string name="button_edit">Изменить</string>
+    <string name="exam_name_hint">Название</string>
+    <string name="teacher_name_hint">ФИО</string>
+    <string name="auditory_hint">Номер аудитории</string>
+    <string name="date_hint">Дата</string>
+    <string name="time_hint">Время</string>
+    <string name="people_in_auditory_hint">Количество</string>
+    <string name="is_abstract_available_hint">Можно/Нельзя</string>
+    <string name="comment_hint">Введите комментаий</string>
 </resources>
