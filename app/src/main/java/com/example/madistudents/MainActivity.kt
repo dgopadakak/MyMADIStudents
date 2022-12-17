@@ -224,13 +224,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 dbh.insertGroup(i)
             }
 
-            val toast = Toast.makeText(
-                applicationContext,
-                "Успешно подключено!\n" +
-                        "Будут использоваться данные, полученные от сервера.",
-                Toast.LENGTH_LONG
-            )
-            toast.show()
+            if (connectionStage != 1)
+            {
+                val toast = Toast.makeText(
+                    applicationContext,
+                    "Успешно подключено!\n" +
+                            "Будут использоваться данные, полученные от сервера.",
+                    Toast.LENGTH_LONG
+                )
+                toast.show()
+            }
 
             progressBar.visibility = View.INVISIBLE
             for (i in 0 until go.getGroups().size)
@@ -307,6 +310,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         {
             val manager: FragmentManager = supportFragmentManager
             val myDialogFragmentDelExam = MyDialogFragmentDelExam()
+            val bundle = Bundle()
+            bundle.putString("exam", go.getExam(currentGroupID, currentExamID).nameOfExam)
+            myDialogFragmentDelExam.arguments = bundle
             myDialogFragmentDelExam.show(manager, "myDialog")
         }
         if (sortId == 9)        // Изменение

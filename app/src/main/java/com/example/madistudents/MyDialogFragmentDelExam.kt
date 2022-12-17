@@ -9,10 +9,12 @@ class MyDialogFragmentDelExam: DialogFragment()
 {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog
     {
+        val arguments: Bundle? = arguments
+        val examName = arguments?.getString("exam")
         val builder = AlertDialog.Builder(activity)
-        builder.setMessage("Вы уверены?")
+        builder.setMessage("Будет удален экзамен по предмету: $examName")
             .setTitle("Внимание!")
-            .setPositiveButton("OK"
+            .setPositiveButton("Продолжить"
             ) { _, _ -> (activity as MainActivity?)?.delExam() }
             .setNegativeButton("Отмена") { _, _ -> }
         return builder.create()
