@@ -15,4 +15,6 @@
     <string name="is_abstract_available">Пользоваться лекциями:</string>
     <string name="comment">Комментарий преподавателя:</string>
     <string name="button_ok">Ок</string>
+    <string name="button_del">Удалить</string>
+    <string name="button_edit">Изменить</string>
 </resources>

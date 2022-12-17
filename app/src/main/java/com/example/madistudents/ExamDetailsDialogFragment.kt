@@ -31,6 +31,8 @@ class ExamDetailsDialogFragment: android.app.DialogFragment()
     private lateinit var textViewPeople: TextView
     private lateinit var textViewAbstract: TextView
     private lateinit var textViewComment: TextView
+    private lateinit var buttonDel: Button
+    private lateinit var buttonEdit: Button
     private lateinit var buttonOk: Button
 
     private var currentIdForSort: Int = -1
@@ -47,6 +49,8 @@ class ExamDetailsDialogFragment: android.app.DialogFragment()
         textViewPeople = view.findViewById(R.id.textViewPeople)
         textViewAbstract = view.findViewById(R.id.textViewAbstract)
         textViewComment = view.findViewById(R.id.textViewComment)
+        buttonDel = view.findViewById(R.id.button_details_delete)
+        buttonEdit = view.findViewById(R.id.button_details_edit)
         buttonOk = view.findViewById(R.id.button_details_ok)
 
         textViewExamName.setOnLongClickListener { setSortId(0) }
@@ -58,6 +62,8 @@ class ExamDetailsDialogFragment: android.app.DialogFragment()
         textViewAbstract.setOnLongClickListener { setSortId(6) }
         textViewComment.setOnLongClickListener { setSortId(7) }
 
+        buttonDel.setOnClickListener { returnDel() }
+        buttonEdit.setOnClickListener { returnEdit() }
         buttonOk.setOnClickListener { returnIdForSort() }
 
         val arguments: Bundle = getArguments()
@@ -76,6 +82,11 @@ class ExamDetailsDialogFragment: android.app.DialogFragment()
             textViewAbstract.text = "нельзя"
         }
         textViewComment.text = arguments.getString("comment")
+        if (arguments.getString("connection") != "1")
+        {
+            buttonDel.isEnabled = false
+            buttonEdit.isEnabled = false
+        }
 
         return view
     }
@@ -104,5 +115,17 @@ class ExamDetailsDialogFragment: android.app.DialogFragment()
     {
         onInputListenerSortId.sendInputSortId(currentIdForSort)
         dialog.dismiss()
+    }
+
+    private fun returnDel()
+    {
+        currentIdForSort = 8
+        returnIdForSort()
+    }
+
+    private fun returnEdit()
+    {
+        currentIdForSort = 9
+        returnIdForSort()
     }
 }

@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.madistudents.databinding.ActivityMainBinding
@@ -52,6 +53,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val go: GroupOperator = GroupOperator()
     private var currentGroupID: Int = -1
     private var currentExamID: Int = -1
+    private var waitingForUpdate: Boolean = false
 
     private lateinit var binding: ActivityMainBinding
 
@@ -100,6 +102,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         bundle.putString("people", tempExam.peopleInAuditory.toString())
                         bundle.putString("abstract", tempExam.isAbstractAvailable.toString())
                         bundle.putString("comment", tempExam.comment)
+                        bundle.putString("connection", connectionStage.toString())
                         examDetails.arguments = bundle
                         examDetails.show(fragmentManager, "MyCustomDialog")
                     }
@@ -220,25 +223,38 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             {
                 dbh.insertGroup(i)
             }
-            if (connectionStage == 0)
-            {
-                val toast = Toast.makeText(
-                    applicationContext,
-                    "Успешно подключено!\n" +
-                            "Будут использоваться данные, полученные от сервера.",
-                    Toast.LENGTH_LONG
-                )
-                toast.show()
-            }
-            connectionStage = 1
+
+            val toast = Toast.makeText(
+                applicationContext,
+                "Успешно подключено!\n" +
+                        "Будут использоваться данные, полученные от сервера.",
+                Toast.LENGTH_LONG
+            )
+            toast.show()
+
             progressBar.visibility = View.INVISIBLE
+            for (i in 0 until go.getGroups().size)
+            {
+                nv.menu.removeItem(i)
+            }
             val tempArrayListGroups: ArrayList<Group> = dbh.getAllData()
             go.setGroups(tempArrayListGroups)
             for (i in 0 until tempArrayListGroups.size)
             {
-                nv.menu.add(0, i, 0,
-                    tempArrayListGroups[i].name as CharSequence)
+                nv.menu.add(
+                    0, i, 0,
+                    tempArrayListGroups[i].name as CharSequence
+                )
             }
+            if (waitingForUpdate || connectionStage == -1)
+            {
+                waitingForUpdate = false
+                recyclerViewExams.adapter = CustomRecyclerAdapterForExams(
+                    go.getExamsNames(currentGroupID),
+                    go.getTeachersNames(currentGroupID)
+                )
+            }
+            connectionStage = 1
         }
 
         init {
@@ -266,6 +282,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return true
     }
 
+    fun delExam()
+    {
+        val tempArrayListOfGroups = go.getGroups()
+        tempArrayListOfGroups[currentGroupID].listOfExams.removeAt(currentExamID)
+        go.setGroups(tempArrayListOfGroups)
+        connection.sendDataToServer("d$currentGroupID,$currentExamID")
+        waitingForUpdate = true
+    }
+
     override fun sendInputSortId(sortId: Int)
     {
         val toast = Toast.makeText(
@@ -274,9 +299,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             Toast.LENGTH_LONG
         )
         toast.show()
-        if (sortId != -1)
+        if (sortId > -1 && sortId < 8)      // Сортировка
         {
             go.sortExams(currentGroupID, sortId)
+        }
+        if (sortId == 8)        // Удаление
+        {
+            val manager: FragmentManager = supportFragmentManager
+            val myDialogFragmentDelExam = MyDialogFragmentDelExam()
+            myDialogFragmentDelExam.show(manager, "myDialog")
+        }
+        if (sortId == 9)        // Изменение
+        {
+
         }
         recyclerViewExams.adapter = CustomRecyclerAdapterForExams(
             go.getExamsNames(currentGroupID),
