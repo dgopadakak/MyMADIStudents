@@ -73,15 +73,23 @@ class EditExamActivity : AppCompatActivity()
                 if (isDateValid(editDate.text.toString().trim())
                     && isTimeValid(editTime.text.toString().trim()))
                 {
-                    val intent = Intent(this@EditExamActivity, MainActivity::class.java)
+                    val intent = Intent(this@EditExamActivity,
+                        MainActivity::class.java)
                     intent.putExtra("action", action)
                     intent.putExtra("exam", editExamName.text.toString().trim())
                     intent.putExtra("teacher", editTeacherName.text.toString().trim())
-                    intent.putExtra("auditory", editAuditory.text.toString().trim())
+                    intent.putExtra("auditory", editAuditory.text.toString().trim().toInt())
                     intent.putExtra("date", editDate.text.toString().trim())
                     intent.putExtra("time", editTime.text.toString().trim())
-                    intent.putExtra("people", editPeople.text.toString().trim())
-                    intent.putExtra("abstract", editAbstract.text.toString().trim())
+                    intent.putExtra("people", editPeople.text.toString().trim().toInt())
+                    if (editAbstract.text.trim() == "можно")
+                    {
+                        intent.putExtra("abstract", 1)
+                    }
+                    else
+                    {
+                        intent.putExtra("abstract", 0)
+                    }
                     intent.putExtra("comment", editComment.text.toString().trim())
                     setResult(RESULT_OK, intent)
                     finish()

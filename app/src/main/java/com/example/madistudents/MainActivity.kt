@@ -1,6 +1,7 @@
 package com.example.madistudents
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -18,6 +19,7 @@ import com.example.madistudents.databinding.ActivityMainBinding
 import com.example.madistudents.forRecyclerView.CustomRecyclerAdapterForExams
 import com.example.madistudents.forRecyclerView.RecyclerItemClickListener
 import com.example.madistudents.ui.faculty.DbHelper
+import com.example.madistudents.ui.faculty.Exam
 import com.example.madistudents.ui.faculty.Group
 import com.example.madistudents.ui.faculty.GroupOperator
 import com.google.android.material.navigation.NavigationView
@@ -287,9 +289,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     fun delExam()
     {
-        val tempArrayListOfGroups = go.getGroups()
-        tempArrayListOfGroups[currentGroupID].listOfExams.removeAt(currentExamID)
-        go.setGroups(tempArrayListOfGroups)
         connection.sendDataToServer("d$currentGroupID,$currentExamID")
         waitingForUpdate = true
     }
@@ -305,6 +304,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if (sortId > -1 && sortId < 8)      // Сортировка
         {
             go.sortExams(currentGroupID, sortId)
+            connection.sendDataToServer("u" + gson.toJson(go))
         }
         if (sortId == 8)        // Удаление
         {
@@ -317,10 +317,54 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
         if (sortId == 9)        // Изменение
         {
-
+            val tempExam = go.getExam(currentGroupID, currentExamID)
+            val intent = Intent()
+            intent.setClass(this, EditExamActivity::class.java)
+            intent.putExtra("action", 2)
+            intent.putExtra("exam", tempExam.nameOfExam)
+            intent.putExtra("teacher", tempExam.nameOfTeacher)
+            intent.putExtra("auditory", tempExam.auditory.toString())
+            intent.putExtra("date", tempExam.date)
+            intent.putExtra("time", tempExam.time)
+            intent.putExtra("people", tempExam.peopleInAuditory.toString())
+            intent.putExtra("abstract", tempExam.isAbstractAvailable.toString())
+            intent.putExtra("comment", tempExam.comment)
+            startActivityForResult(intent, 1)
         }
         recyclerViewExams.adapter = CustomRecyclerAdapterForExams(
             go.getExamsNames(currentGroupID),
             go.getTeachersNames(currentGroupID))
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
+    {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK)
+        {
+            val action = data?.getSerializableExtra("action") as Int
+            val examName = data.getSerializableExtra("exam") as String
+            val teacherName = data.getSerializableExtra("teacher") as String
+            val auditory = data.getSerializableExtra("auditory") as Int
+            val date = data.getSerializableExtra("date") as String
+            val time = data.getSerializableExtra("time") as String
+            val people = data.getSerializableExtra("people") as Int
+            val abstract = data.getSerializableExtra("abstract") as Int
+            val comment = data.getSerializableExtra("comment") as String
+
+            if (action == 1)
+            {
+
+            }
+            if (action == 2)
+            {
+                val tempExam = Exam(examName, teacherName, auditory, date, time, people
+                    , abstract, comment)
+                val tempExamJSON: String = gson.toJson(tempExam)
+                val tempStringToSend = "e$currentGroupID,$currentExamID##$tempExamJSON"
+                connection.sendDataToServer(tempStringToSend)
+                waitingForUpdate = true
+            }
+        }
     }
 }
