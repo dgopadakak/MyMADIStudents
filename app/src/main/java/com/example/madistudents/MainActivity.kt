@@ -405,14 +405,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             if (action == 1)
             {
-                val tempStringToSend = "a$currentGroupID##$tempExamJSON"
+                val tempStringToSend = "a${go.getGroups()[currentGroupID].name}##$tempExamJSON"
                 connection.sendDataToServer(tempStringToSend)
                 waitingForUpdate = true
             }
             if (action == 2)
             {
-                val tempStringToSend = "e${go.getGroups()[currentGroupID].name}" +
-                        ",$currentExamID##$tempExamJSON"
+                val tempStringToSend = "e$currentGroupID,$currentExamID##$tempExamJSON"
                 connection.sendDataToServer(tempStringToSend)
                 waitingForUpdate = true
             }
