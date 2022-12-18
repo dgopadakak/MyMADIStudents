@@ -50,14 +50,15 @@ class GroupOperator()
             val tempArrayListOfExams: ArrayList<Exam> = ArrayList()
             for (i in groups[indexGroup].listOfExams)
             {
-                tempArrayListOfExamsNames.add(i.nameOfExam)
+                tempArrayListOfExamsNames.add(i.nameOfExam.lowercase(Locale.ROOT))
             }
             tempArrayListOfExamsNames.sort()
             for (i in tempArrayListOfExamsNames)
             {
                 for (j in groups[indexGroup].listOfExams)
                 {
-                    if (i == j.nameOfExam && !tempArrayListOfExams.contains(j))
+                    if (i == j.nameOfExam.lowercase(Locale.ROOT)
+                        && !tempArrayListOfExams.contains(j))
                     {
                         tempArrayListOfExams.add(j)
                         break
@@ -73,14 +74,15 @@ class GroupOperator()
             val tempArrayListOfExams: ArrayList<Exam> = ArrayList()
             for (i in groups[indexGroup].listOfExams)
             {
-                tempArrayListOfTeacherNames.add(i.nameOfTeacher)
+                tempArrayListOfTeacherNames.add(i.nameOfTeacher.lowercase(Locale.ROOT))
             }
             tempArrayListOfTeacherNames.sort()
             for (i in tempArrayListOfTeacherNames)
             {
                 for (j in groups[indexGroup].listOfExams)
                 {
-                    if (i == j.nameOfTeacher && !tempArrayListOfExams.contains(j))
+                    if (i == j.nameOfTeacher.lowercase(Locale.ROOT)
+                        && !tempArrayListOfExams.contains(j))
                     {
                         tempArrayListOfExams.add(j)
                         break
@@ -195,14 +197,15 @@ class GroupOperator()
             val tempArrayListOfExams: ArrayList<Exam> = ArrayList()
             for (i in groups[indexGroup].listOfExams)
             {
-                tempArrayListOfComment.add(i.comment)
+                tempArrayListOfComment.add(i.comment.lowercase(Locale.ROOT))
             }
             tempArrayListOfComment.sort()
             for (i in tempArrayListOfComment)
             {
                 for (j in groups[indexGroup].listOfExams)
                 {
-                    if (i == j.comment && !tempArrayListOfExams.contains(j))
+                    if (i == j.comment.lowercase(Locale.ROOT)
+                        && !tempArrayListOfExams.contains(j))
                     {
                         tempArrayListOfExams.add(j)
                         break

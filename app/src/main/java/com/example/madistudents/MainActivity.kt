@@ -301,10 +301,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             if (waitingForUpdate || connectionStage == -1)
             {
                 waitingForUpdate = false
-                recyclerViewExams.adapter = CustomRecyclerAdapterForExams(
-                    go.getExamsNames(currentGroupID),
-                    go.getTeachersNames(currentGroupID)
-                )
+                if (currentGroupID != -1)
+                {
+                    recyclerViewExams.adapter = CustomRecyclerAdapterForExams(
+                        go.getExamsNames(currentGroupID),
+                        go.getTeachersNames(currentGroupID)
+                    )
+                }
             }
             connectionStage = 1
         }
@@ -352,7 +355,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if (sortId > -1 && sortId < 8)      // Сортировка
         {
             go.sortExams(currentGroupID, sortId)
-            connection.sendDataToServer("u" + gson.toJson(go))
+            if (connectionStage == 1)
+            {
+                connection.sendDataToServer("u" + gson.toJson(go))
+            }
         }
         if (sortId == 8)        // Удаление
         {
