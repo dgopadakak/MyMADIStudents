@@ -58,6 +58,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var currentGroupID: Int = -1
     private var currentExamID: Int = -1
     private var waitingForUpdate: Boolean = false
+    private lateinit var groupTitle: String
 
     private lateinit var binding: ActivityMainBinding
 
@@ -338,7 +339,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //        toast.show()
         drawerLayout.closeDrawer(GravityCompat.START)
         textViewForStart.visibility = View.INVISIBLE
-        toolbar.title = "Группа ${item.title}"
+        groupTitle = "Группа ${item.title}"
+        toolbar.title = groupTitle
         invalidateOptionsMenu()
         currentGroupID = item.itemId
         recyclerViewExams.adapter = CustomRecyclerAdapterForExams(go.getExamsNames(currentGroupID),
@@ -355,18 +357,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun sendInputSortId(sortId: Int)
     {
-        val toast = Toast.makeText(
-            applicationContext,
-            "ID параметра для сортировки: $sortId.",
-            Toast.LENGTH_LONG
-        )
-        toast.show()
         if (sortId > -1 && sortId < 8)      // Сортировка
         {
             go.sortExams(currentGroupID, sortId)
             if (connectionStage == 1)
             {
                 connection.sendDataToServer("u" + gson.toJson(go))
+            }
+            toolbar.title = when (sortId)
+            {
+                0 -> "$groupTitle сорт. Предмет"
+                1 -> "$groupTitle сорт. ФИО"
+                2 -> "$groupTitle сорт. Аудитория"
+                3 -> "$groupTitle сорт. Д+В"
+                4 -> "$groupTitle сорт. Д+В"
+                5 -> "$groupTitle сорт. Кол-во"
+                6 -> "$groupTitle сорт. Лекции"
+                7 -> "$groupTitle сорт. Комментарий"
+                else -> groupTitle
             }
         }
         if (sortId == 8)        // Удаление
