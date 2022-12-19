@@ -1,8 +1,11 @@
 package com.example.madistudents
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -44,11 +47,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var dbVersion = 2
     private var startTime: Long = 0
 
-    private lateinit var textViewGroupName: TextView
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var nv: NavigationView
     private lateinit var toolbar: androidx.appcompat.widget.Toolbar
     private lateinit var progressBar: ProgressBar
+    private lateinit var textViewForStart: TextView
     private lateinit var recyclerViewExams: RecyclerView
 
     private val go: GroupOperator = GroupOperator()
@@ -72,13 +75,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //                .setAction("Action", null).show()
 //        }
 
-        textViewGroupName = findViewById(R.id.textViewGroupName)
         drawerLayout = binding.drawerLayout
         nv = binding.navView
         nv.setNavigationItemSelectedListener(this)
         toolbar = findViewById(R.id.toolbar)
         toolbar.apply { setNavigationIcon(R.drawable.ic_my_menu) }
         toolbar.setNavigationOnClickListener { drawerLayout.openDrawer(GravityCompat.START) }
+        textViewForStart = findViewById(R.id.textViewForStart)
+        textViewForStart.visibility = View.INVISIBLE
         progressBar = findViewById(R.id.progressBar)
         recyclerViewExams = findViewById(R.id.recyclerViewExams)
         recyclerViewExams.visibility = View.INVISIBLE
@@ -131,11 +135,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             )
                             toast.show()
                         }
-//                        val vibrator = this@MainActivity.getSystemService(
-//                            Context.VIBRATOR_SERVICE) as Vibrator
-//                        vibrator.vibrate(
-//                            VibrationEffect.createOneShot(200
-//                            , VibrationEffect.DEFAULT_AMPLITUDE))
+                        val vibrator = this@MainActivity.getSystemService(
+                            Context.VIBRATOR_SERVICE) as Vibrator
+                        vibrator.vibrate(
+                            VibrationEffect.createOneShot(200
+                            , VibrationEffect.DEFAULT_AMPLITUDE))
                     }
                 }
             )
@@ -247,6 +251,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             toast.show() }
                         connectionStage = -1
                         progressBar.visibility = View.INVISIBLE
+                        activity.runOnUiThread { textViewForStart.visibility = View.VISIBLE }
                         val tempArrayListGroups: ArrayList<Group> = dbh.getAllData()
                         go.setGroups(tempArrayListGroups)
                         for (i in 0 until tempArrayListGroups.size)
@@ -285,6 +290,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
 
             progressBar.visibility = View.INVISIBLE
+            if (connectionStage == 0)
+            {
+                textViewForStart.visibility = View.VISIBLE
+            }
             for (i in 0 until go.getGroups().size)
             {
                 nv.menu.removeItem(i)
@@ -327,9 +336,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //            Toast.LENGTH_SHORT
 //        )
 //        toast.show()
-        //toolbar.title = "Группа ${item.title}"
-        val tempString = "Группа ${item.title}"
-        textViewGroupName.text = tempString
+        drawerLayout.closeDrawer(GravityCompat.START)
+        textViewForStart.visibility = View.INVISIBLE
+        toolbar.title = "Группа ${item.title}"
         invalidateOptionsMenu()
         currentGroupID = item.itemId
         recyclerViewExams.adapter = CustomRecyclerAdapterForExams(go.getExamsNames(currentGroupID),

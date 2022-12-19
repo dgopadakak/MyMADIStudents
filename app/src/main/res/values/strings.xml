@@ -27,4 +27,5 @@
     <string name="comment_hint">Введите комментаий</string>
     <string name="plus_button_description">Довавить экзамен</string>
     <string name="plus">➕</string>
+    <string name="for_start">Для начала работы выберете группу из меню слева</string>
 </resources>
