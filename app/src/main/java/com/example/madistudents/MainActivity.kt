@@ -3,6 +3,7 @@ package com.example.madistudents
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
@@ -11,7 +12,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -26,6 +26,7 @@ import com.example.madistudents.ui.faculty.Exam
 import com.example.madistudents.ui.faculty.Group
 import com.example.madistudents.ui.faculty.GroupOperator
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import java.io.BufferedReader
@@ -129,12 +130,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                         else
                         {
-                            val toast = Toast.makeText(
-                                applicationContext,
-                                "Приложение оффлайн!",
-                                Toast.LENGTH_LONG
-                            )
-                            toast.show()
+                            Snackbar.make(findViewById(R.id.app_bar_main),
+                                "Приложение оффлайн!", Snackbar.LENGTH_LONG)
+                                .setBackgroundTint(Color.RED)
+                                .show()
                         }
                         val vibrator = this@MainActivity.getSystemService(
                             Context.VIBRATOR_SERVICE) as Vibrator
@@ -243,13 +242,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 {
                     if (System.currentTimeMillis() - startTime > 5000L && connectionStage == 0)
                     {
-                        activity.runOnUiThread { val toast = Toast.makeText(
-                            applicationContext,
+                        activity.runOnUiThread { Snackbar.make(findViewById(R.id.app_bar_main),
                             "Подключиться не удалось!\n" +
-                                    "Будут использоваться данные из локальной базы данных.",
-                            Toast.LENGTH_LONG
-                        )
-                            toast.show() }
+                                    "Будет использоваться локальная база данных.",
+                            Snackbar.LENGTH_LONG)
+                            .setBackgroundTint(Color.YELLOW)
+                            .show() }
                         connectionStage = -1
                         progressBar.visibility = View.INVISIBLE
                         activity.runOnUiThread { textViewForStart.visibility = View.VISIBLE }
@@ -281,13 +279,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             if (connectionStage != 1)
             {
-                val toast = Toast.makeText(
-                    applicationContext,
+                Snackbar.make(findViewById(R.id.app_bar_main),
                     "Успешно подключено!\n" +
-                            "Будут использоваться данные, полученные от сервера.",
-                    Toast.LENGTH_LONG
-                )
-                toast.show()
+                            "Будут использоваться серверные данные.",
+                    Snackbar.LENGTH_LONG)
+                    .show()
             }
 
             progressBar.visibility = View.INVISIBLE
@@ -331,12 +327,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-//        val toast = Toast.makeText(   // не удалять, заменить
-//            applicationContext,
-//            "Выбрана группа: $item.",
-//            Toast.LENGTH_SHORT
-//        )
-//        toast.show()
+        Snackbar.make(findViewById(R.id.app_bar_main),
+            "Выбрана группа: ${item.title}.",
+            Snackbar.LENGTH_LONG)
+            .show()
         drawerLayout.closeDrawer(GravityCompat.START)
         textViewForStart.visibility = View.INVISIBLE
         groupTitle = "Группа ${item.title}"
