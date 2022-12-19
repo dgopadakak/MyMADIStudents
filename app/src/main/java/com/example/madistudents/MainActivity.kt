@@ -283,6 +283,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     "Успешно подключено!\n" +
                             "Будут использоваться серверные данные.",
                     Snackbar.LENGTH_LONG)
+                    .setBackgroundTint(Color.GREEN)
                     .show()
             }
 
