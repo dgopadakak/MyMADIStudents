@@ -15,6 +15,7 @@
     <string name="is_abstract_available">Пользоваться лекциями:</string>
     <string name="comment">Комментарий преподавателя:</string>
     <string name="button_ok">Ок</string>
+    <string name="button_cancel">Отмена</string>
     <string name="button_del">Удалить</string>
     <string name="button_edit">Изменить</string>
     <string name="exam_name_hint">Название</string>
@@ -28,4 +29,6 @@
     <string name="plus_button_description">Довавить экзамен</string>
     <string name="plus">➕</string>
     <string name="for_start">Для начала работы выберете группу из меню слева</string>
+    <string name="for_sort">Для сортировки по желаемому атрибуту -
+        зажмите соответствующее поле</string>
 </resources>
