@@ -2,11 +2,12 @@ package com.example.madistudents
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.graphics.Color
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
 import java.time.LocalTime
 import java.util.*
@@ -96,33 +97,27 @@ class EditExamActivity : AppCompatActivity()
                 }
                 else
                 {
-                    val toast = Toast.makeText(
-                        applicationContext,
-                        "Проверьте дату и время!",
-                        Toast.LENGTH_SHORT
-                    )
-                    toast.show()
+                    Snackbar.make(findViewById(R.id.button_confirm),
+                        "Проверьте дату и время!", Snackbar.LENGTH_LONG)
+                        .setBackgroundTint(Color.RED)
+                        .show()
                 }
             }
             else
             {
-                val toast = Toast.makeText(
-                    applicationContext,
+                Snackbar.make(findViewById(R.id.button_confirm),
                     "Поле \"Пользоваться лекциями\" поддерживает только " +
-                            "значения \"можно\" или \"нельзя\"!",
-                    Toast.LENGTH_SHORT
-                )
-                toast.show()
+                            "значения \"можно\" или \"нельзя\"!", Snackbar.LENGTH_LONG)
+                    .setBackgroundTint(Color.RED)
+                    .show()
             }
         }
         else
         {
-            val toast = Toast.makeText(
-                applicationContext,
-                "Заполните обязательные поля!",
-                Toast.LENGTH_SHORT
-            )
-            toast.show()
+            Snackbar.make(findViewById(R.id.button_confirm),
+                "Заполните обязательные поля!", Snackbar.LENGTH_LONG)
+                .setBackgroundTint(Color.RED)
+                .show()
         }
     }
 
