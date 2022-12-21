@@ -1,10 +1,17 @@
 package com.example.madistudents.ui.faculty
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
 import java.util.*
-import kotlin.collections.ArrayList
 
+@Entity
 class GroupOperator()
 {
+    @PrimaryKey
+    private var id: Int = 1
+
+    @TypeConverters(GroupOperatorConverter::class)
     private var groups: ArrayList<Group> = ArrayList()
 
     fun getGroups(): ArrayList<Group>
@@ -15,6 +22,16 @@ class GroupOperator()
     fun setGroups(newGroups: ArrayList<Group>)
     {
         groups = newGroups
+    }
+
+    fun setId(id: Int)
+    {
+        this.id = id
+    }
+
+    fun getId(): Int
+    {
+        return id
     }
 
     fun getExamsNames(indexGroup: Int): ArrayList<String>

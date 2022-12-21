@@ -7,7 +7,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
-class DbHelper(
+class DbHelper(     //  legacy, not used
     context: Context?,
     name: String?,
     factory: SQLiteDatabase.CursorFactory?,

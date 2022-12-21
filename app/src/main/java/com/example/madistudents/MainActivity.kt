@@ -21,10 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.madistudents.databinding.ActivityMainBinding
 import com.example.madistudents.forRecyclerView.CustomRecyclerAdapterForExams
 import com.example.madistudents.forRecyclerView.RecyclerItemClickListener
-import com.example.madistudents.ui.faculty.DbHelper
-import com.example.madistudents.ui.faculty.Exam
-import com.example.madistudents.ui.faculty.Group
-import com.example.madistudents.ui.faculty.GroupOperator
+import com.example.madistudents.ui.faculty.*
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
@@ -44,9 +41,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val serverPort = 9876
     private lateinit var connection: Connection
     private var connectionStage: Int = 0
-    private lateinit var dbh: DbHelper
     private var dbVersion = 2
     private var startTime: Long = 0
+
+    private lateinit var db: AppDatabase
+    private lateinit var goDao: GroupOperatorDao
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var nv: NavigationView
@@ -55,7 +54,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var textViewForStart: TextView
     private lateinit var recyclerViewExams: RecyclerView
 
-    private val go: GroupOperator = GroupOperator()
+    private var go: GroupOperator = GroupOperator()
     private var currentGroupID: Int = -1
     private var currentExamID: Int = -1
     private var waitingForUpdate: Boolean = false
@@ -71,11 +70,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setContentView(binding.root)
 
         setSupportActionBar(binding.appBarMain.toolbar)
-
-//        binding.appBarMain.fab.setOnClickListener{ view ->
-//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                .setAction("Action", null).show()
-//        }
 
         drawerLayout = binding.drawerLayout
         nv = binding.navView
@@ -145,7 +139,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             )
         )
 
-        dbh = DbHelper(this, "MyFirstDB", null, dbVersion)
+        db = App.instance?.database!!
+        goDao = db.groupOperatorDao()
         startTime = System.currentTimeMillis()
         connection = Connection(serverIP, serverPort, "{R}", this)
     }
@@ -251,12 +246,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         connectionStage = -1
                         progressBar.visibility = View.INVISIBLE
                         activity.runOnUiThread { textViewForStart.visibility = View.VISIBLE }
-                        val tempArrayListGroups: ArrayList<Group> = dbh.getAllData()
-                        go.setGroups(tempArrayListGroups)
-                        for (i in 0 until tempArrayListGroups.size)
+                        go = goDao.getById(1)
+                        for (i in 0 until go.getGroups().size)
                         {
                             activity.runOnUiThread { nv.menu.add(0, i, 0,
-                                tempArrayListGroups[i].name as CharSequence) }
+                                go.getGroups()[i].name as CharSequence) }
                         }
                     }
                 }
@@ -270,12 +264,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         private fun processingInputStream(text: String)
         {
-            dbh.removeAllData()
+            goDao.delete(GroupOperator())
             val tempGo: GroupOperator = gson.fromJson(text, GroupOperator::class.java)
-            for (i in tempGo.getGroups())
-            {
-                dbh.insertGroup(i)
-            }
+            goDao.insert(tempGo)
 
             if (connectionStage != 1)
             {
@@ -296,7 +287,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             {
                 nv.menu.removeItem(i)
             }
-            val tempArrayListGroups: ArrayList<Group> = dbh.getAllData()
+            val tempArrayListGroups: ArrayList<Group> = /*dbh.getAllData()*/tempGo.getGroups()
             go.setGroups(tempArrayListGroups)
             for (i in 0 until tempArrayListGroups.size)
             {
