@@ -1,6 +1,8 @@
-package com.example.madistudents.ui.faculty
+package com.example.madistudents.ui.faculty.dbWithRoom
 
 import androidx.room.TypeConverter
+import com.example.madistudents.ui.faculty.Exam
+import com.example.madistudents.ui.faculty.Group
 
 class GroupOperatorConverter
 {

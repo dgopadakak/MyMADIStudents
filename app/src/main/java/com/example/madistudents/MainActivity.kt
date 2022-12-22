@@ -22,6 +22,9 @@ import com.example.madistudents.databinding.ActivityMainBinding
 import com.example.madistudents.forRecyclerView.CustomRecyclerAdapterForExams
 import com.example.madistudents.forRecyclerView.RecyclerItemClickListener
 import com.example.madistudents.ui.faculty.*
+import com.example.madistudents.ui.faculty.dbWithRoom.App
+import com.example.madistudents.ui.faculty.dbWithRoom.AppDatabase
+import com.example.madistudents.ui.faculty.dbWithRoom.GroupOperatorDao
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson

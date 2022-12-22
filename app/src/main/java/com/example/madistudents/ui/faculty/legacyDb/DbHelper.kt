@@ -1,4 +1,4 @@
-package com.example.madistudents.ui.faculty
+package com.example.madistudents.ui.faculty.legacyDb
 
 import android.annotation.SuppressLint
 import android.content.ContentValues
@@ -6,6 +6,8 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import com.example.madistudents.ui.faculty.Exam
+import com.example.madistudents.ui.faculty.Group
 
 class DbHelper(     //  legacy, not used
     context: Context?,
@@ -117,7 +119,8 @@ class DbHelper(     //  legacy, not used
             cursor2.moveToFirst()
             while (!cursor2.isAfterLast)
             {
-                tempArrayListForExams.add(Exam(
+                tempArrayListForExams.add(
+                    Exam(
                     cursor2.getString(cursor2.getColumnIndex(col23)),
                     cursor2.getString(cursor2.getColumnIndex(col24)),
                     cursor2.getInt(cursor2.getColumnIndex(col25)),
@@ -126,11 +129,14 @@ class DbHelper(     //  legacy, not used
                     cursor2.getInt(cursor2.getColumnIndex(col28)),
                     cursor2.getInt(cursor2.getColumnIndex(col29)),
                     cursor2.getString(cursor2.getColumnIndex(col210))
-                ))
+                )
+                )
                 cursor2.moveToNext()
             }
-            arrayListForReturn.add(Group(cursor1.getString(cursor1.getColumnIndex(col12)),
-                tempArrayListForExams))
+            arrayListForReturn.add(
+                Group(cursor1.getString(cursor1.getColumnIndex(col12)),
+                tempArrayListForExams)
+            )
             cursor2.close()
             cursor1.moveToNext()
         }

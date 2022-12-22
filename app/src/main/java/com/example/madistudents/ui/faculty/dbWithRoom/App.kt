@@ -1,4 +1,4 @@
-package com.example.madistudents.ui.faculty
+package com.example.madistudents.ui.faculty.dbWithRoom
 
 import android.app.Application
 import androidx.room.Room.databaseBuilder
