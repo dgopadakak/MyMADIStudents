@@ -44,7 +44,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val serverPort = 9876
     private lateinit var connection: Connection
     private var connectionStage: Int = 0
-    private var dbVersion = 2
     private var startTime: Long = 0
 
     private lateinit var db: AppDatabase
