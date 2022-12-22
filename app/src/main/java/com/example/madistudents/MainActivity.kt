@@ -156,7 +156,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean
     {
-        if (currentGroupID != -1)
+        if (currentGroupID != -1 && connectionStage == 1)
         {
             menu.getItem(0).isVisible = true
         }
