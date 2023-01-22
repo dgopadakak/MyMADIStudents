@@ -12,6 +12,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -55,6 +56,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var progressBar: ProgressBar
     private lateinit var textViewForStart: TextView
     private lateinit var recyclerViewExams: RecyclerView
+    private var resultLauncher = registerForActivityResult(
+        ActivityResultContracts
+            .StartActivityForResult())
+    { result ->
+        if (result.resultCode == Activity.RESULT_OK)
+        {
+            val data: Intent? = result.data
+            processOnActivityResult(data)
+        }
+    }
 
     private var go: GroupOperator = GroupOperator()
     private var currentGroupID: Int = -1
@@ -171,7 +182,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             val intent = Intent()
             intent.setClass(this, EditExamActivity::class.java)
             intent.putExtra("action", 1)
-            startActivityForResult(intent, 1)
+            resultLauncher.launch(intent)
         }
         return super.onOptionsItemSelected(item)
     }
@@ -388,44 +399,47 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             intent.putExtra("people", tempExam.peopleInAuditory.toString())
             intent.putExtra("abstract", tempExam.isAbstractAvailable.toString())
             intent.putExtra("comment", tempExam.comment)
-            startActivityForResult(intent, 1)
+            resultLauncher.launch(intent)
         }
         recyclerViewExams.adapter = CustomRecyclerAdapterForExams(
             go.getExamsNames(currentGroupID),
             go.getTeachersNames(currentGroupID))
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
+    private fun processOnActivityResult(data: Intent?)
     {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == RESULT_OK)
-        {
-            val action = data?.getSerializableExtra("action") as Int
-            val examName = data.getSerializableExtra("exam") as String
-            val teacherName = data.getSerializableExtra("teacher") as String
-            val auditory = data.getSerializableExtra("auditory") as Int
-            val date = data.getSerializableExtra("date") as String
-            val time = data.getSerializableExtra("time") as String
-            val people = data.getSerializableExtra("people") as Int
-            val abstract = data.getSerializableExtra("abstract") as Int
-            val comment = data.getSerializableExtra("comment") as String
-            val tempExam = Exam(examName, teacherName, auditory, date, time, people
-                , abstract, comment)
-            val tempExamJSON: String = gson.toJson(tempExam)
+        val action = data!!.getIntExtra("action", -1)
+        val examName = data.getStringExtra("exam")
+        val teacherName = data.getStringExtra("teacher")
+        val auditory = data.getIntExtra("auditory", -1)
+        val date = data.getStringExtra("date")
+        val time = data.getStringExtra("time")
+        val people = data.getIntExtra("people", -1)
+        val abstract = data.getIntExtra("abstract", 0)
+        val comment = data.getStringExtra("comment")
+        val tempExam = Exam(examName!!, teacherName!!, auditory, date!!, time!!, people
+            , abstract, comment!!)
+        val tempExamJSON: String = gson.toJson(tempExam)
 
-            if (action == 1)
-            {
-                val tempStringToSend = "a${go.getGroups()[currentGroupID].name}##$tempExamJSON"
-                connection.sendDataToServer(tempStringToSend)
-                waitingForUpdate = true
-            }
-            if (action == 2)
-            {
-                val tempStringToSend = "e$currentGroupID,$currentExamID##$tempExamJSON"
-                connection.sendDataToServer(tempStringToSend)
-                waitingForUpdate = true
-            }
+        if (action == 1)
+        {
+            val tempStringToSend = "a${go.getGroups()[currentGroupID].name}##$tempExamJSON"
+            connection.sendDataToServer(tempStringToSend)
+            waitingForUpdate = true
+        }
+        if (action == 2)
+        {
+            val tempStringToSend = "e$currentGroupID,$currentExamID##$tempExamJSON"
+            connection.sendDataToServer(tempStringToSend)
+            waitingForUpdate = true
+        }
+        if (action == -1)
+        {
+            Snackbar.make(findViewById(R.id.app_bar_main),
+                "Ошибка добавления/изменения!",
+                Snackbar.LENGTH_LONG)
+                .setBackgroundTint(Color.RED)
+                .show()
         }
     }
 }

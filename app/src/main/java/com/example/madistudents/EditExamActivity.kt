@@ -83,7 +83,7 @@ class EditExamActivity : AppCompatActivity()
                     intent.putExtra("date", editDate.text.toString().trim())
                     intent.putExtra("time", editTime.text.toString().trim())
                     intent.putExtra("people", editPeople.text.toString().trim().toInt())
-                    if (editAbstract.text.trim() == "можно")
+                    if (editAbstract.text.toString().trim() == "можно")
                     {
                         intent.putExtra("abstract", 1)
                     }
